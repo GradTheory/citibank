@@ -1,0 +1,28 @@
+let currentQueryString=parseQueryString(location.search.substring(1));let base="https://app.eo.chat";function getJSON(url,callback){let request=new XMLHttpRequest()
+request.onload=function(){try{let response=JSON.parse(request.response)
+callback(response)}catch(exception){}}
+request.open("get",url,!0)
+request.setRequestHeader("Accept","application/json")
+request.send()}
+let savedQueryString={}
+try{savedQueryString=JSON.parse(localStorage.getItem("savedQueryString"))}catch(e){}
+var query=Object.assign({},savedQueryString,currentQueryString);try{localStorage.setItem("savedQueryString",JSON.stringify(query))}catch(e){}
+function getQueryParameters(key){if(query[key])return query[key];else return""}
+function parseQueryString(string){if(!string)return{};return JSON.parse('{"'+string.replace(/&/g,'","').replace(/=/g,'":"')+'"}',function(key,value){return key===""?value:decodeURIComponent(value)})}
+function decorateTransitionURL(url,e){if(e&&e.getAttribute("data-decorate")==="false"||!url||!url.length)return url;if(url.charAt(0)==="/"){return url}
+var parts=url.split("?");if(parts[1]){var savedQueryString={};var currentQueryString=parseQueryString(parts[1]);try{savedQueryString=JSON.parse(localStorage.getItem("savedQueryString"))}catch(exception){savedQueryString={}}
+query=Object.assign({},savedQueryString,currentQueryString);url=parts[0]}
+var append="?";Object.keys(query).forEach(function(key){append+=key+"="+encodeURIComponent(query[key])+"&"})
+return(url+append).replace(/\&$/,'')}
+function objectify(element){if(navigator.userAgent.toLowerCase().indexOf("safari")!==-1&&navigator.userAgent.toLowerCase().indexOf("chrome")===-1){let object=document.createElement("object")
+let ratio=element.offsetHeight/element.offsetWidth;if(element.id){object.setAttribute("id",element.id)}
+object.classList=element.classList
+object.setAttribute("data",element.src)
+object.setAttribute("type","image/svg+xml")
+object.setAttribute("ratio",ratio)
+object.style.height=element.offsetHeight+"px"
+object.addEventListener("load",function(o){o.target.style.height="unset"})
+element.parentNode.replaceChild(object,element)
+if(ratio!==1){window.addEventListener("resize",function(o){object.style.width="unset"
+object.style.height="unset"
+let expectedWidth=Math.floor(object.offsetHeight/ratio);object.style.width=expectedWidth+"px";if(expectedWidth!==object.offsetWidth){object.style.width=object.offsetWidth+"px";object.style.height=object.offsetWidth*ratio+"px"}})}}}

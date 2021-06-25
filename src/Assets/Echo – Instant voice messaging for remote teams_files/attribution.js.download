@@ -1,0 +1,66 @@
+const attribution = {
+    attributes: {},
+
+    parseQueryString(queryString) {
+        if (!queryString) return {};
+        queryString = queryString.replace(/^\?|&$/g,"")
+        return JSON.parse('{"' + queryString.replace(/&/g, '","').replace(/=/g,'":"') + '"}', function(key, value) { return key===""?value:decodeURIComponent(value) });
+    },
+    mergeAttributes() {
+        let newAttributes = this.parseQueryString(location.search)
+        let currentAttributes = JSON.parse(localStorage.getItem("_echo_attributes") ? localStorage.getItem("_echo_attributes") : "{}")
+        if (Object.keys(newAttributes).length) {
+            for (const key in newAttributes) {
+                if (key === "_ga") {
+                    continue
+                }
+                currentAttributes[key] = newAttributes[key]
+            }
+            localStorage.setItem("_echo_attributes", JSON.stringify(currentAttributes))
+        }
+        this.attributes = currentAttributes
+    },
+    decorate(completeUrl, e) {
+
+        attribution.mergeAttributes()
+        var query = this.attributes
+
+        if (e && e.getAttribute("data-decorate") === "false") return completeUrl
+        if (completeUrl.charAt(0) === "/") return completeUrl
+
+        var urlAndHash = completeUrl.split("#");
+        var url = urlAndHash[0]
+        var hash = urlAndHash[1]
+        var parts = url.split("?");
+        if (parts[1]) {
+            var currentQueryString = this.parseQueryString(parts[1]);
+            query = Object.assign({}, query, currentQueryString);
+            url = parts[0];
+        }
+
+        var append = ''
+        if (Object.keys(query).length) {
+            for (const key in query) {
+                append += key + "=" + encodeURIComponent(query[key]) + "&";
+            }
+        }
+
+        if (!query.hasOwnProperty("_ga") && ga && typeof ga === 'function') {
+            ga(function() {
+                var trackers = ga.getAll();
+                append = append + trackers[0].get('linkerParam');
+            });
+        }
+
+        return url + "?" + append + (hash ? "#" + hash : "");
+    },
+    setupDecoration() {
+        document.querySelectorAll("a").forEach((element) => {
+            element.onclick = () => {
+                element.href = attribution.decorate(element.getAttribute('href'),  element)
+            }
+        })
+    }
+}
+
+attribution.mergeAttributes()

@@ -1,0 +1,11 @@
+function attachDecorationListeners(){var elements=document.getElementsByTagName('a');for(var i=0,len=elements.length;i<len;i++){elements[i].addEventListener("click",function(element){let e=element.target
+e.setAttribute("href",decorateTransitionURL(e.getAttribute("href"),e))})}}
+function addMenuToggleListener(){let menuElement=document.getElementById("menu")
+menuElement.addEventListener("click",function(){menuElement.classList.toggle('shown')},{passive:!0})}
+function underlineWhereNeeded(){var elements=document.getElementsByClassName("underline-when-loaded");for(let element of elements){element.classList.remove("underline-when-loaded")}}
+function localizeNumbers(){let elements=document.querySelectorAll("[data-localize-number]")
+for(let element of elements){element.innerHTML=parseInt(element.innerHTML).toLocaleString()}}
+window.addEventListener('load',function(){addMenuToggleListener()
+attachDecorationListeners()
+underlineWhereNeeded()
+localizeNumbers()})
